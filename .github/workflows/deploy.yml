@@ -80,8 +80,8 @@ jobs:
       #     echo "IMAGE_TAG=${{ inputs.version || github.sha }}" >> $GITHUB_ENV
 
       - name: Deploy with Kamal
-        # env:
-        #   RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+        env:
+          DOCER_REGISTRY_SERVER: ${{secrets.ECR_URI_NO_NAME}}
         run:
           kamal setup
           #  \
