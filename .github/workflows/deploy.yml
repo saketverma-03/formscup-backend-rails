@@ -1,0 +1,85 @@
+name: Deploy Rails with Kamal
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        type: choice
+        required: true
+        default: "production"
+        options:
+          - production
+          - staging
+      version:
+        description: "Version tag (default: latest git SHA)"
+        required: false
+        type: string
+      force:
+        description: "Force deployment"
+        type: boolean
+        required: false
+        default: false
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: formscup/backend
+  KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
+  DOCER_REGISTRY_SERVER: ${{secrets.ECR_URI_NO_NAME}}
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+
+      - name: Install Kamal
+        run: gem install kamal
+
+      - name: Store SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PEM_FILE }}" > ~/.ssh/id.pem
+          chmod 600 ~/.ssh/id.pem
+
+      # - name: Set version tag
+      #   run: |
+      #     echo "IMAGE_TAG=${{ inputs.version || github.sha }}" >> $GITHUB_ENV
+
+      - name: Deploy with Kamal
+        # env:
+        #   RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+        run:
+          kamal setup
+          #  \
+          #   --registry ${{ env.KAMAL_REGISTRY }}/${{ env.ECR_REPOSITORY }} \
+          #   --tag ${{ env.IMAGE_TAG }} \
+          #   --ssh-key ~/.ssh/deploy.pem \
+          #   ${{ inputs.environment != '' && format('--config=config/deploy/{0}.yml', inputs.environment) || '' }} \
+          #   ${{ inputs.force && '--force' || '' }}
