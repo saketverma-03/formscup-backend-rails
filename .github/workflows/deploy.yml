@@ -31,7 +31,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to ${{ inputs.environment || 'production' }}
+    name: Deploy to ${{ inputs.environment || 'deployment' }}
     runs-on: ubuntu-latest
 
     permissions:
@@ -41,6 +41,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+        - name: Debug AWS Credentials
+        run: |
+        echo "AWS Region is set: ${{ secrets.AWS_REGION != '' }}"
+        echo "AWS Access Key is set: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}"
+        echo "AWS Secret is set: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' }}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
