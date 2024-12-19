@@ -11,6 +11,7 @@ class User < ApplicationRecord
 
 
   has_many :sessions, dependent: :destroy
+  has_many :project_users, dependent: :destroy
   has_many :projects, through: :project_users
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
