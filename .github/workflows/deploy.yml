@@ -75,6 +75,10 @@ jobs:
           echo "${{ secrets.PEM_FILE }}" > ~/.ssh/id.pem
           chmod 600 ~/.ssh/id.pem
 
+      - name: Set registry URL
+        run: |
+          echo "DOCER_REGISTRY_SERVER=${{secrets.ECR_URI_NO_NAME}}" >> $GITHUB_ENV
+
       # - name: Set version tag
       #   run: |
       #     echo "IMAGE_TAG=${{ inputs.version || github.sha }}" >> $GITHUB_ENV
@@ -83,10 +87,19 @@ jobs:
         env:
           DOCER_REGISTRY_SERVER: ${{secrets.ECR_URI_NO_NAME}}
         run:
-          kamal setup
+          kamal setup --verbose
           #  \
           #   --registry ${{ env.KAMAL_REGISTRY }}/${{ env.ECR_REPOSITORY }} \
           #   --tag ${{ env.IMAGE_TAG }} \
           #   --ssh-key ~/.ssh/deploy.pem \
           #   ${{ inputs.environment != '' && format('--config=config/deploy/{0}.yml', inputs.environment) || '' }} \
           #   ${{ inputs.force && '--force' || '' }}
+      - name: Show Docker and Kamal Logs on Failure
+        if: failure()
+        run: |
+          echo "Docker logs:"
+          docker ps -a
+          docker images
+          echo "Kamal debug info:"
+          kamal version
+          kamal doctor
