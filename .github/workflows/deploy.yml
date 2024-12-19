@@ -9,10 +9,10 @@ on:
         description: "Environment to deploy to"
         type: choice
         required: true
-        default: "production"
+        default: "deployment"
         options:
           - production
-          - staging
+          - deployment
       version:
         description: "Version tag (default: latest git SHA)"
         required: false
