@@ -27,7 +27,7 @@ registry:
   # server: registry.digitalocean.com / ghcr.io / ...
   username: AWS
   # server: 741448916253.dkr.ecr.us-east-1.amazonaws.com
-  server: KAMAL_DOCER_REGISTRY_SERVER
+  server: DCOKER_SERVER
 
   # Always use an access token rather than real password when possible.
   password: <%= %x(aws ecr get-login-password) %>

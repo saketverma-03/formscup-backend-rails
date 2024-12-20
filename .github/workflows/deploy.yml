@@ -27,7 +27,7 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: formscup/backend
   KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
-  DOCER_REGISTRY_SERVER: ${{secrets.ECR_URI_NO_NAME}}
+  DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
 
 jobs:
   deploy:
@@ -45,9 +45,7 @@ jobs:
 
       - name: Debug AWS Credentials
         run: |
-          echo "AWS Region is set: ${{ secrets.AWS_REGION != '' }}"
-          echo "AWS Access Key is set: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}"
-          echo "AWS Secret is set: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' }}"
+          echo "DOCKER SERVER Secret is set: ${{ env.DOCKER_SERVER != '' }}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -74,10 +72,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PEM_FILE }}" > ~/.ssh/id.pem
           chmod 600 ~/.ssh/id.pem
-
-      - name: Set registry URL
-        run: |
-          echo "DOCER_REGISTRY_SERVER=${{secrets.ECR_URI_NO_NAME}}" >> $GITHUB_ENV
 
       # - name: Set version tag
       #   run: |
