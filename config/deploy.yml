@@ -4,6 +4,8 @@ service: form_scup_backend
 # Name of the container image.
 image: formscup/backend
 
+<% require "dotenv"; Dotenv.load(".env") %>
+
 # Deploy to these servers.
 servers:
   web:
@@ -27,7 +29,8 @@ registry:
   # server: registry.digitalocean.com / ghcr.io / ...
   username: AWS
   # server: 741448916253.dkr.ecr.us-east-1.amazonaws.com
-  server: DCOKER_SERVER
+  server: <%= ENV["DCOKER_REG"] %>
+
 
   # Always use an access token rather than real password when possible.
   password: <%= %x(aws ecr get-login-password) %>
