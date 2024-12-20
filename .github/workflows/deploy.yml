@@ -23,12 +23,6 @@ on:
         required: false
         default: false
 
-env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY: formscup/backend
-  KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
-  DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
-
 jobs:
   deploy:
     name: Deploy to ${{ inputs.environment || 'deployment' }}
@@ -42,6 +36,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set Up ENV
+        env:
+          AWS_REGION: us-east-1
+          ECR_REPOSITORY: formscup/backend
+          KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
+          DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
 
       - name: Debug AWS Credentials
         run: |
