@@ -45,9 +45,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         env:
           AWS_REGION: us-east-1
-          ECR_REPOSITORY: formscup/backend
-          KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
-          DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -82,9 +79,13 @@ jobs:
           ECR_REPOSITORY: formscup/backend
           KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
           DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
+          T_DCOKER_SERVER: "${{secrets.ECR_URI_NO_NAME}}"
+
         run: |
           echo "DEBUG"
           echo "DOCKER SERVER Secret is set: ${{ env.DOCKER_SERVER != '' }}"
+          echo "SHELL_DOCKER SERVER Secret is set:  $DOCKER_SERVER "
+          echo "T_DOCKER SERVER Secret is set: ${{ env.T_DOCKER_SERVER != '' }}"
           kamal setup --verbose
 
           #  \
