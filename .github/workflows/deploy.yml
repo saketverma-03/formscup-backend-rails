@@ -37,13 +37,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set Up ENV
-        env:
-          AWS_REGION: us-east-1
-          ECR_REPOSITORY: formscup/backend
-          KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
-          DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
-
       - name: Debug AWS Credentials
         run: |
           echo "DOCKER SERVER Secret is set: ${{ env.DOCKER_SERVER != '' }}"
@@ -80,9 +73,15 @@ jobs:
 
       - name: Deploy with Kamal
         env:
-          DOCER_REGISTRY_SERVER: ${{secrets.ECR_URI_NO_NAME}}
-        run:
+          AWS_REGION: us-east-1
+          ECR_REPOSITORY: formscup/backend
+          KAMAL_REGISTRY: ${{secrets.ECR_URI_NO_NAME}}
+          DCOKER_SERVER: ${{secrets.ECR_URI_NO_NAME}}
+        run: |
+          echo "DEBUG"
+          echo "DOCKER SERVER Secret is set: ${{ env.DOCKER_SERVER != '' }}"
           kamal setup --verbose
+
           #  \
           #   --registry ${{ env.KAMAL_REGISTRY }}/${{ env.ECR_REPOSITORY }} \
           #   --tag ${{ env.IMAGE_TAG }} \
