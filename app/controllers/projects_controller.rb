@@ -4,7 +4,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects
   def index
-    @projects = Current.user.projects
+    @projects = Current.user.projects.order(created_at: :desc)
     render json: @projects
   end
 
@@ -25,14 +25,14 @@ class ProjectsController < ApplicationController
     else
       render json: @project.errors, status: :unprocessable_entity
     end
-    rescue ActiveRecord::RecordInvalid => e
-      render json: { error: e.message }, status: :unprocessable_entity
+    rescue ActiveRecord::RecordInvalid
+      render json: { error: @project.errors }, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /projects/1
   def update
-    if @project.update(project_params)
+    if @project.update(project_update_params)
       render json: @project
     else
       render json: @project.errors, status: :unprocessable_entity
@@ -48,7 +48,7 @@ class ProjectsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_project
       unless Current.user.projects.exists?(params.expect(:id))
-        render json:  { error: "you are not authorized to access this project" }, status: :unauthorized
+        render json:  { error: "you are not authorized to access this project" }, status: :forbidden
         return
       end
       @project = Project.find(params.expect(:id))
@@ -56,6 +56,10 @@ class ProjectsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def project_params
-      params.expect(project: [ :name, :description ])
+      params.expect(project: [ :name, :description, :domain_name ])
+    end
+
+    def project_update_params
+      params.expect(project: [ :is_pinned, :name ])
     end
 end

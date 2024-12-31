@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_09_151737) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_31_023647) do
+  create_table "forms", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "project_id", null: false
+    t.json "fields"
+    t.string "auto_reply_to_field"
+    t.string "token"
+    t.string "dev_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_forms_on_project_id"
+  end
+
   create_table "project_users", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
@@ -27,6 +39,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_151737) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "domain_name"
+    t.boolean "is_pinned"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -47,6 +60,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_151737) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "forms", "projects"
   add_foreign_key "project_users", "projects"
   add_foreign_key "project_users", "users"
   add_foreign_key "sessions", "users"
