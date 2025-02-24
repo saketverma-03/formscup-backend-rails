@@ -10,23 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_31_024521) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_23_143504) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "form_data", force: :cascade do |t|
-    t.integer "form_id", null: false
-    t.json "data"
-    t.integer "status", default: 0
+  create_table "form_fields", force: :cascade do |t|
+    t.bigint "form_id", null: false
+    t.integer "field_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["form_id"], name: "index_form_data_on_form_id"
+    t.index ["form_id"], name: "index_form_fields_on_form_id"
+  end
+
+  create_table "form_notify_emails", force: :cascade do |t|
+    t.bigint "verified_emails_id", null: false
+    t.bigint "forms_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forms_id"], name: "index_form_notify_emails_on_forms_id"
+    t.index ["verified_emails_id"], name: "index_form_notify_emails_on_verified_emails_id"
   end
 
   create_table "forms", force: :cascade do |t|
     t.string "name", null: false
     t.integer "project_id", null: false
-    t.json "fields"
     t.string "auto_reply_to_field"
     t.string "token"
     t.string "dev_token"
@@ -72,9 +79,21 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_31_024521) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
-  add_foreign_key "form_data", "forms"
+  create_table "verified_emails", force: :cascade do |t|
+    t.string "email", null: false
+    t.bigint "projects_id", null: false
+    t.boolean "verified", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["projects_id"], name: "index_verified_emails_on_projects_id"
+  end
+
+  add_foreign_key "form_fields", "forms"
+  add_foreign_key "form_notify_emails", "forms", column: "forms_id"
+  add_foreign_key "form_notify_emails", "verified_emails", column: "verified_emails_id"
   add_foreign_key "forms", "projects"
   add_foreign_key "project_users", "projects"
   add_foreign_key "project_users", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "verified_emails", "projects", column: "projects_id"
 end

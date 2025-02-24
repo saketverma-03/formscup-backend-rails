@@ -1,5 +1,6 @@
 class FormsController < ApplicationController
   before_action :set_form, only: %i[ show update destroy ]
+  before_action :is_my, only: %i[ show update destroy ]
 
   # GET /forms
   def index
@@ -15,10 +16,11 @@ class FormsController < ApplicationController
 
   # POST /forms
   def create
+    puts form_params
     @form = Form.new(form_params)
 
     if @form.save
-      render json: @form, status: :created, location: @form
+      render json: @form, status: :created
     else
       render json: @form.errors, status: :unprocessable_entity
     end
@@ -26,7 +28,7 @@ class FormsController < ApplicationController
 
   # PATCH/PUT /forms/1
   def update
-    if @form.update(form_params)
+    if @form.update(form)
       render json: @form
     else
       render json: @form.errors, status: :unprocessable_entity
@@ -46,6 +48,13 @@ class FormsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def form_params
-      params.expect(form: [ :name, :project_id, :fields, :auto_reply_to_field, :token, :dev_token ])
+      params.expect(form: [ :name,  :project_id, fields: [] ])
+    end
+
+    # only allow if form is of the current user
+    def is_my
+      unless ProjectUser.find_by(user_id: Current.user.id, project_id: params.expect(:project_id))
+        render json: { error: "you are not authorised for this action" }, status: :unauthorized
+      end
     end
 end

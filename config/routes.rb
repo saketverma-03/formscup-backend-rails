@@ -1,6 +1,13 @@
 Rails.application.routes.draw do
-  resources :forms
-  resources :projects
+  resources :projects do
+    resources :forms
+    resources :verified_emails
+    resources :verified_emails_verification, only: [ :create ]
+  end
+
+  # project email list verification routes
+  post "verifi_project_email", to: "verified_emails_verification#post"
+
 
   # Authentication routes
   post "sign_in", to: "sessions#create"
